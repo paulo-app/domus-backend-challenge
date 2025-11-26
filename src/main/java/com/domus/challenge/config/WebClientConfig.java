@@ -10,7 +10,7 @@ public class WebClientConfig {
     @Bean
     public WebClient moviesApiClient(WebClient.Builder builder) {
         return builder
-                .baseUrl("https://challenge.iugolabs.com/api/movies")
+                .baseUrl("https://challenge.iugolabs.com") //Just the host, without '/api/movies'
                 .build();
     }
 

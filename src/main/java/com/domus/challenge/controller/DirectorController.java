@@ -40,10 +40,9 @@ public class DirectorController {
 		try {
 			threshold = Integer.parseInt(thresholdParam);
 		} catch (NumberFormatException ex) {
-			return Mono
-					.just(ResponseEntity
+			return Mono.just(ResponseEntity
 							.badRequest()
-							.body(Map.of("error", List.of("Threshold must be a valid integer number"))));
+							.body(Map.of("error", List.of("threshold must be an integer"))));
 		}
 		
 		return this.service.findDirectorsAboveThreshold(threshold)
