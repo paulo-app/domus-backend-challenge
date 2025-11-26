@@ -1,73 +1,176 @@
-# Domus Back-End Developer Challenge.
+Domus Back-End Developer Challenge
 
-## Description 
+Author: Paulo Cabello Acha
+Tech Stack: Java 21 · Spring Boot 3 · WebFlux · WebClient · JUnit 5 · MockWebServer · Swagger/OpenAPI
 
-In this challenge, the REST API contains information about a collection of movies released after the year 2010, directed by acclaimed directors.
-Given a threshold value, your task is to use the API to retrieve a list of directors who have directed more movies than the specified threshold. Specifically, the API should return the names of directors whose movie count is strictly greater than the given threshold, sorted alphabetically.
+🚀 Overview
 
-To access the movie collection, perform an HTTP GET request to the following endpoint:
+This project implements the take-home coding challenge for the Domus Backend Developer role.
 
-```
-https://challenge.iugolabs.com/api/movies/search?page=<pageNumber>
-```
+The goal is to expose an endpoint:
 
-where <pageNumber> is an integer denoting the page of the results to return.
+GET /api/directors?threshold=X
 
-The response to such request is a JSON with the following 5 fields:
 
-- page: The current page of the results
-- per_page: The maximum number of movies returned per page.
-- total: The total number of movies on all pages of the result.
-- total_pages: The total number of pages with results.
-- data: An array of objects containing movies returned on the requested page
+which returns all directors who have directed more movies than the given threshold, based on a remote paginated API:
 
-Each movie record has the following schema:
+https://challenge.iugolabs.com/api/movies/search?page=N
 
-- Title: title of the movie
-- Year: year the movie was released
-- Rated: movie rating
-- Released: movie release date
-- Runtime: movie duration time in minutes
-- Genre: move genre
-- Director: movie director
-- Writer: movie writer 
-- Actors: movie actors  
 
-##  Task
+The returned list must be:
 
-Fork the provided repository and implement a REST API endpoint using the provided template:
+Strictly greater than threshold
 
-```
-/api/directors?threshold=X
-```
+Alphabetically sorted
 
-This endpoint must return a JSON object containing the names of directors whose number of movies directed is strictly greater than the given threshold.
+Fail-proof (validation, errors, stability)
 
-The names should be returned in alphabetical order.
+🧠 Architecture Summary and Decisions Taken:
+✔ WebFlux + WebClient
 
-Sample : `/api/directors?threshold=4`
+Used for non-blocking, reactive HTTP calls to the external API.
 
-Json response:
-```
-{  "directors": ["Martin Scorsese","Woody Allen"] }
-```
+✔ Intelligent Pagination
 
-## Criteria
+First request loads page 1 and extracts total_pages
 
-Some things we'll evaluate are:
+Uses Flux.range(2, totalPages) to fetch only remaining pages
 
-- Correctness: The solution must return accurate results based on the given threshold. Ensure the route and query parameters are handled correctly.
-- Fail proof: The solution should handle errors and edge cases gracefully. Negative threshold values should return an empty list. Non-number thresholds should return an error message.
-- Tests: The solution should have tests.
-- Prefer newer technologies such as WebFlux over traditional RestTemplate.
-- Implement an intelligent solution for handling pagination.
-- Include Swagger documentation with detailed endpoint descriptions.
-- Documentation: Create an .md file explaining the solution and considerations.
-- Use external libraries like Lombok to facilitate things.
-- Correct use of Spring decorators such as @Service and @Autowired.
+To be more efficient, it avoids redundant calls
 
-## Submission
+Parallelized with CONCURRENCY = 5
 
-1. Fork the repository as a public repository.
-2. Implement the solution.
-3. Link the repository to the person who sent you the challenge.
+✔ Clean Service Layer
+
+All logic is contained within DirectorServiceImpl, adhering to the Single Responsibility Principle (SOLID).
+
+✔ Validation
+
+Negative threshold: empty list.
+
+Non-numeric threshold: HTTP 400 with error message.
+
+Threshold >= 0: service is executed normally.
+
+✔ Swagger/OpenAPI
+
+Automatically generates endpoint documentation.
+
+✔ Testing Strategy
+
+Unit tests with MockWebServer (fast and no external calls)
+
+Integration tests with WebTestClient (controller-level)
+
+This ensures correctness and prevents regressions.
+
+📦 Project Structure:
+
+src/main/java/com/domus/challenge
+    ├── controller
+    │     └── DirectorController.java
+    ├── service
+    │     ├── IDirectorService.java
+    │     └── DirectorServiceImpl.java
+    ├── dto
+    │     ├── RemoteMovie.java
+    │     └── RemotePageResponse.java
+    └── config
+          └── WebClientConfig.java
+
+src/test/java/com/domus/challenge
+    ├── service
+    │     └── DirectorServiceTest.java
+    └── controller
+          └── DirectorControllerTest.java
+
+🧩 Endpoint Documentation
+GET /api/directors?threshold=X
+Query Parameter:
+Name	Type	Required	Description
+threshold	integer	yes	Return directors with more than this number of movies
+Example Response:
+{
+  "directors": [
+    "Martin Scorsese",
+    "Woody Allen"
+  ]
+}
+
+Error Case:
+{
+  "error": ["threshold must be an integer"]
+}
+
+🛠 How to Run
+1. Build
+mvn clean install
+
+2. Run
+mvn spring-boot:run
+
+App runs at:
+
+http://localhost:8080
+
+🧪 How to Run Tests
+mvn test
+
+
+Tests include:
+
+- Reactive service pagination and mapping.
+
+- Controller validation and responses.
+
+- All API interactions fully mocked.
+
+📘 Swagger UI
+
+Once running, access:
+
+http://localhost:8080/swagger-ui.html
+
+
+or:
+
+/swagger-ui/index.html
+
+🧠 Technical Considerations & Decisions Taken
+
+1) Reactive WebClient over RestTemplate
+
+Required by challenge; fully non-blocking.
+
+2) Avoid redundant calls
+
+Page 1 is fetched once → remaining pages are fetched dynamically.
+
+3) Graceful error handling
+
+Threshold validation prevents incorrect calls.
+
+4) Thread-safety & concurrency
+
+Parallel fetches use a controlled concurrency level (=5).
+
+5) DTO mapping with @JsonProperty
+
+Ensures compatibility with remote JSON fields using uppercase keys.
+
+6) MockWebServer for reliability
+
+External API is never called during tests: fast, stable and predictable.
+
+🏁 Challenge Completed
+
+This solution is:
+
+✔ Efficient
+✔ Reactive
+✔ Tested
+✔ Documented
+✔ Clean & maintainable
+✔ Ready for production-level review
+
+If you have any questions or want to discuss the design, I’ll be happy to walk you through it.
