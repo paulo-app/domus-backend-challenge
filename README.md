@@ -29,6 +29,9 @@ Fail-proof (validation, errors, stability)
 ✔ WebFlux + WebClient
 
 Used for non-blocking, reactive HTTP calls to the external API.
+WebFlux is Spring's stack tool for scalable apps built on Reactor.
+Instead of using a thread-per-request model, it uses event-loop based execution, allowing much higher throughput with fewer resources.
+It works with Mono and Flux to model async pipelines without blocking threads.
 
 ✔ Intelligent Pagination
 
@@ -129,12 +132,12 @@ Tests include:
 
 Once running, access:
 
-http://localhost:8080/swagger-ui.html
+http://localhost:8080/swagger-ui/index.html
 
+or directly go to:
 
-or:
+http://localhost:8080/docs
 
-/swagger-ui/index.html
 
 🧠 Technical Considerations & Decisions Taken
 

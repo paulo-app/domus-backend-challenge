@@ -24,11 +24,9 @@ public class DirectorController {
 	public DirectorController(IDirectorService service) {
 		this.service = service;
 	}
-
-	@Operation(
-			summary = "List directors who have directed more movies than the given threshold",
-			description = "Returns directors sorted alphabetically. Threshold must be a non-negative integer."
-			)
+	
+	@Operation(summary = "List directors who have directed more movies than the given threshold",
+			   description = "Returns directors sorted alphabetically. Threshold must be a non-negative integer.")
 	@GetMapping("/directors")
 	public Mono<ResponseEntity<Map<String, List<String>>>> getDirectors(
 			@Parameter(description = "Integer threshold")
