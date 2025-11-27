@@ -1,4 +1,4 @@
-Domus Back-End Developer Challenge
+# Domus Back-End Developer Challenge
 
 Author: Paulo Cabello Acha
 Tech Stack: Java 21 · Spring Boot 3 · WebFlux · WebClient · JUnit 5 · MockWebServer · Swagger/OpenAPI
@@ -89,6 +89,9 @@ src/test/java/com/domus/challenge
 
 🧩 Endpoint Documentation
 GET /api/directors?threshold=X
+
+curl "http://localhost:8080/api/directors?threshold=2"
+
 Query Parameter:
 Name	Type	Required	Description
 threshold	integer	yes	Return directors with more than this number of movies
@@ -103,6 +106,21 @@ Example Response:
 Error Case:
 {
   "error": ["threshold must be an integer"]
+}
+
+🟢 Health Check Endpoint
+
+This project includes a simple health endpoint to verify that the application is running.
+
+GET /ping
+
+curl "http://localhost:8080/ping"
+
+Response:
+{
+  "status": "ok",
+  "message": "application is up and running",
+  "datetime": "2025-11-27T15:31:11Z"
 }
 
 🛠 How to Run
